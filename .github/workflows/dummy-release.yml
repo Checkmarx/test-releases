@@ -12,6 +12,8 @@ concurrency:
   group: dummy-release
   cancel-in-progress: false
 
+permissions: {} # deny by default; each job grants only what it needs
+
 jobs:
   release:
     name: Create draft release
