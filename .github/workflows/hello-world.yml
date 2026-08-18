@@ -2,6 +2,7 @@ name: Hello World
 
 on:
   workflow_dispatch:
+  push:
 
 concurrency:
   group: hello-world
@@ -12,7 +13,7 @@ permissions: {} # deny by default
 jobs:
   hello:
     name: Print hello world
-    runs-on: ubuntu-latest
+    runs-on: cx-public-ubuntu-x64
     steps:
       - name: Print hello world
         run: echo "Hello World"
