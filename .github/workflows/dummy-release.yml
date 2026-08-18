@@ -1,0 +1,46 @@
+name: Dummy Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. v1.0.0)"
+        required: true
+        type: string
+
+concurrency:
+  group: dummy-release
+  cancel-in-progress: false
+
+permissions: {} # deny by default; each job grants only what it needs
+
+jobs:
+  release:
+    name: Create draft release
+    runs-on: cx-public-ubuntu-x64
+    # Requires required reviewers on the "release" environment (Settings > Environments)
+    # so this job pauses for approval before it can create the draft release.
+    environment: release
+    permissions:
+      contents: write # create the tag/draft release via gh CLI
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Build (dummy)
+        run: |
+          mkdir -p dist
+          echo "Dummy release artifact for $RELEASE_VERSION" > dist/release-notes.txt
+
+      - name: Create draft release
+        run: |
+          gh release create "$RELEASE_VERSION" \
+            --draft \
+            --title "$RELEASE_VERSION" \
+            --generate-notes \
+            dist/release-notes.txt
